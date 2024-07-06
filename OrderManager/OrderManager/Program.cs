@@ -10,10 +10,11 @@ while ( true )
     address = ReadAddress();
     ConfirmOrder();
 }
+
 static void PlaceOrder()
 {
     Console.Write( @"Чтобы оформить новый заказ, нажмите ""Enter""" );
-    while ( Console.ReadLine() != "" )
+    while ( !string.IsNullOrWhiteSpace( Console.ReadLine() ) )
     {
         Console.Write( @"Чтобы оформить новый заказ, нажмите ""Enter""" );
     }
