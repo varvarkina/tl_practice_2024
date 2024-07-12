@@ -1,5 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
+const int tryLimit = 5;
+Dictionary<string, string> dictionary = BuildDictionary();
+
 PrintWelcomeMessage();
 
 while ( true )
@@ -18,7 +21,7 @@ while ( true )
             AddWords();
             break;
         default:
-            Console.WriteLine( "Unknown command" );
+            Console.WriteLine( @"Неизвестная команда. Введите цифры ""1"", ""2"" или ""3""" );
             break;
     }
 }
@@ -43,7 +46,11 @@ void PrintMenu()
 static Dictionary<string, string> BuildDictionary()
 {
     var dictionary = new Dictionary<string, string>();
-    string path = "Dictionary.txt";
+    string path = "C:/study/tl_practice_2024/Dictionary/Dictionary/bin/Debug/net8.0/Dictionary.txt";
+    if ( !File.Exists( path ) )
+    {
+        File.Create( path );
+    }
     using ( StreamReader reader = new StreamReader( path ) )
     {
         string line;
@@ -58,14 +65,14 @@ static Dictionary<string, string> BuildDictionary()
 
 static string RusProcess()
 {
-    string word = Console.ReadLine();
+    string word = Console.ReadLine().ToLower();
     int count = 0;
     while ( string.IsNullOrWhiteSpace( word ) ||
         !Regex.IsMatch( word, @"^[ёЁа-яА-Я'-]+$" ) ||
         Regex.IsMatch( word, @"^['-]+$" ) )
     {
         count++;
-        if ( count == 5 )
+        if ( count == tryLimit )
         {
             throw new Exception();
         }
@@ -78,14 +85,14 @@ static string RusProcess()
 
 static string EngProcess()
 {
-    string word = Console.ReadLine();
+    string word = Console.ReadLine().ToLower();
     int count = 0;
     while ( string.IsNullOrWhiteSpace( word ) ||
         !Regex.IsMatch( word, @"^[a-zA-Z'-]+$" ) ||
         Regex.IsMatch( word, @"^['-]+$" ) )
     {
         count++;
-        if ( count == 5 )
+        if ( count == tryLimit )
         {
             throw new Exception();
         }
@@ -96,9 +103,8 @@ static string EngProcess()
     return word;
 }
 
-static void RusToEng()
+void RusToEng()
 {
-    Dictionary<string, string> dictionary = BuildDictionary();
     Console.Write( "Введите слово на русском языке.\nРусский: " );
     try
     {
@@ -118,9 +124,8 @@ static void RusToEng()
     }
 }
 
-static void EngToRus()
+void EngToRus()
 {
-    Dictionary<string, string> dictionary = BuildDictionary();
     Console.Write( "Введите слово на английском языке.\nАнглийский: " );
     try
     {
@@ -146,10 +151,9 @@ static void EngToRus()
     }
 }
 
-static void AddWords()
+void AddWords()
 {
     string path = "Dictionary.txt";
-    Dictionary<string, string> dictionary = BuildDictionary();
     Console.Write( "Введите слово на русском языке: " );
     try
     {
@@ -173,6 +177,7 @@ static void AddWords()
             writer.WriteLine( $"{rusWord} {engWord}" );
         }
         Console.WriteLine( "Слово успешно добавлено в словарь!" );
+        dictionary = BuildDictionary();
     }
     catch ( Exception )
     {
