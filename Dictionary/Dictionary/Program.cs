@@ -2,13 +2,14 @@
 
 const int tryLimit = 5;
 Dictionary<string, string> dictionary = BuildDictionary();
+string userCommand = "";
 
 PrintWelcomeMessage();
 
-while ( true )
+while ( userCommand != "4" )
 {
     PrintMenu();
-    string userCommand = Console.ReadLine();
+    userCommand = Console.ReadLine();
     switch ( userCommand )
     {
         case "1":
@@ -20,8 +21,11 @@ while ( true )
         case "3":
             AddWords();
             break;
+        case "4":
+            Console.WriteLine("Работа приложения завершена. Нажмите любую клавишу, чтобы закрыть это окно.");
+            break;
         default:
-            Console.WriteLine( @"Неизвестная команда. Введите цифры ""1"", ""2"" или ""3""" );
+            Console.WriteLine( @"Неизвестная команда. Введите цифры ""1"", ""2"", ""3"" или ""4""" );
             break;
     }
 }
@@ -41,23 +45,23 @@ void PrintMenu()
     Console.WriteLine( "[1] Перевести слово с русского на английский" );
     Console.WriteLine( "[2] Перевести слово с английского на русский" );
     Console.WriteLine( "[3] Добавить новое слово в словарь" );
+    Console.WriteLine( "[4] Выйти из приложения" );
 }
 
 static Dictionary<string, string> BuildDictionary()
 {
     var dictionary = new Dictionary<string, string>();
-    string path = "C:/study/tl_practice_2024/Dictionary/Dictionary/bin/Debug/net8.0/Dictionary.txt";
-    if ( !File.Exists( path ) )
+    string path = "Dictionary.txt";
+    if ( File.Exists( path ) )
     {
-        File.Create( path );
-    }
-    using ( StreamReader reader = new StreamReader( path ) )
-    {
-        string line;
-        while ( ( line = reader.ReadLine() ) != null )
+        using ( StreamReader reader = new StreamReader( path ) )
         {
-            string[] words = line.Split( ' ' );
-            dictionary.Add( words[ 0 ], words[ 1 ] );
+            string line;
+            while ( ( line = reader.ReadLine() ) != null )
+            {
+                string[] words = line.Split( ' ' );
+                dictionary.Add( words[ 0 ], words[ 1 ] );
+            }
         }
     }
     return dictionary;
@@ -65,7 +69,7 @@ static Dictionary<string, string> BuildDictionary()
 
 static string RusProcess()
 {
-    string word = Console.ReadLine().ToLower();
+    string word = Console.ReadLine();
     int count = 0;
     while ( string.IsNullOrWhiteSpace( word ) ||
         !Regex.IsMatch( word, @"^[ёЁа-яА-Я'-]+$" ) ||
@@ -80,12 +84,12 @@ static string RusProcess()
             "русского алфавита, тире и апострофа.\nРусский: " );
         word = Console.ReadLine();
     }
-    return word;
+    return word.ToLower();
 }
 
 static string EngProcess()
 {
-    string word = Console.ReadLine().ToLower();
+    string word = Console.ReadLine();
     int count = 0;
     while ( string.IsNullOrWhiteSpace( word ) ||
         !Regex.IsMatch( word, @"^[a-zA-Z'-]+$" ) ||
@@ -100,7 +104,7 @@ static string EngProcess()
             "латинского алфавита, тире и апострофа.\nАнглийский: " );
         word = Console.ReadLine();
     }
-    return word;
+    return word.ToLower();
 }
 
 void RusToEng()
@@ -172,7 +176,7 @@ void AddWords()
                 "Введите другой перевод этого слова на английский: " );
             engWord = EngProcess();
         }
-        using ( StreamWriter writer = new StreamWriter( path, true ) )
+        using ( StreamWriter writer = File.AppendText( path ) )
         {
             writer.WriteLine( $"{rusWord} {engWord}" );
         }
